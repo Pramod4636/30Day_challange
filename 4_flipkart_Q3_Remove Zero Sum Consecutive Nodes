@@ -1,0 +1,77 @@
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Question : 
+Given the head of a linked list, we repeatedly delete consecutive sequences of nodes that sum to 0 until there are no such sequences.
+
+After doing so, return the head of the final linked list.  You may return any such answer. 
+
+(Note that in the examples below, all sequences are serializations of ListNode objects.)
+Example 1 :
+Input: head = [1,2,-3,3,1]
+Output: [3,1]
+Note: The answer [1,2,1] would also be accepted.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Qlink : https://leetcode.com/problems/remove-zero-sum-consecutive-nodes-from-linked-list/description/
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Intuition 
+- prefixsum of arr [0.....i] is same as prfixsum of  arr[0...j] where j < i i.e prefix sum is alredy seen before 
+then arr[ j+1 ......i ] interval sum is 0 . 
+we have to delete this intervals . 
+
+- To check priviously present : map is created 
+   key => presum  value => pointer to that node 
+
+- Deletion of interval : we required to delete entries from list and map also . 
+   Deletion in Map : 
+   start node = mp[presum]->next ( 1st node of sum 0 interval )
+   traverse and calculate presum and delete from map 
+   Until presum again found . 
+   
+   mp[presum]->next = temp->next ( deletion of list ) 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Complexity
+- Time complexity: O(N) traversing and deletion at most N so 2N is time comlexity  
+
+- Space complexity: O(N) sotring map 
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Code
+```
+class Solution {
+public:
+    ListNode* removeZeroSumSublists(ListNode* head) {
+
+      // Attaching one extra node at start of list : entire list make sum 0 then we have to previous node required for deletion 
+      ListNode *dummy = new ListNode(0) , *curr = dummy;
+      dummy->next = head;
+      
+      unordered_map<int,ListNode*> mp;
+      int presum = 0 ; 
+      while ( curr)
+      {
+          presum += curr->val;
+          if(mp.count(presum)) // previously seen then deleted the 
+          {
+             int p = presum ;        
+             curr = mp[presum]->next; // 1st elment to last delete 
+             p += curr->val;
+             while(p != presum  ) // other than prefix sum inbetween all delete from mp;
+             {   
+                 mp.erase(p);
+                 curr = curr->next;
+                p += curr->val;
+             }
+             mp[presum]->next = curr->next;
+          }
+          else 
+            mp[presum ] = curr;
+
+          curr = curr->next;
+      } 
+      return dummy->next;
+    }
+};
+```

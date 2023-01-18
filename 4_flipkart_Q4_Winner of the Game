@@ -1,0 +1,109 @@
+# Dates :  Created :                    Rev : 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q : 
+There are n friends that are playing a game. The friends are sitting in a circle and are numbered from 1 to n in clockwise order. More formally, 
+moving clockwise from the ith friend brings you to the (i+1)th friend for 1 <= i < n, and moving clockwise from the nth friend brings you to the 1st friend.
+The rules of the game are as follows:
+
+Start at the 1st friend.
+Count the next k friends in the clockwise direction including the friend you started at. The counting wraps around the circle and may
+count some friends more than once.
+The last friend you counted leaves the circle and loses the game.
+If there is still more than one friend in the circle, go back to step 2 starting from the friend immediately clockwise of the friend who just lost and repeat.
+Else, the last friend in the circle wins the game.
+Given the number of friends, n, and an integer k, return the winner of the game.
+
+Q link  : https://leetcode.com/problems/find-the-winner-of-the-circular-game/description/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Method 1 : 
+queue : do simulation 
+n-1 deletion : 
+each deletion :   reach kth element and delete that one ( to reach k-1 first remove and reinsert at end ) 
+# Code
+```
+class Solution {
+public:
+    int findTheWinner(int n, int k) {
+     queue<int> q;
+     for( int i = 1 ; i <= n ; ++i )
+     {
+         q.push(i);
+     }
+
+     for(int i = 0 ; i < n-1 ; ++i ) // n-1 times remove kth elment 
+     {
+         // kth elmen
+         // reaching tth element by poping first t-1 element and inserting again at end becuase  they will in game 
+         for( int j = 0 ; j < k-1 ; ++j)
+         {
+             int x = q.front();
+             q.pop();
+             q.push(x);
+         } 
+         q.pop(); // removing kth element 
+     }
+
+     return q.front();
+
+    }
+};
+
+```
+---------------------------------------------------------------------------------------------------------------------------------------------------
+#Method 2 : 
+Recursion :  f(n,k)  = (f(n-1,k) +k)% n 
+initional arragment : 0 -> 1 -> 2 -> 3 ->4 ->5 ....
+k = 2    
+after deletion :   list 3->4->5->6->0->...
+is simillar   as     0->1->2->3->4.....
+shifting indices by k 
+so recusion form in this way 
+
+Better Understanding : 
+https://cs.stackexchange.com/questions/7048/a-recursive-formula-for-generalized-josephus-problem 
+# Code
+```
+class Solution {
+public:
+    int helper(int n , int k ) // sovled using 0 based index . 
+    {
+        if(n == 1 ) 
+         return 0 ;  // 1 student left then return winer 
+
+        return  (helper(n-1,k)+k)%n; // n-1 solution k poistion move then its answer to n 
+    }
+    int findTheWinner(int n, int k) {
+
+        return helper(n,k)+1;  // 1 based indeex answer return 
+        
+    }
+};
+
+```
+---------------------------------------------------------------------------------------------------------------------------------------------------
+#Method 3 : 
+converting recusino in memoization with space optimziation 
+to compute nth we required only n-1 th result 
+this result previous for next finding . 
+# Code
+```
+
+class Solution {
+public:
+    
+    int findTheWinner(int n, int k) {
+
+         int prev = 0 ; 
+         int curr;
+         for (int i = 1 ; i <= n ; ++i )
+         {
+             curr = (prev+k) % i;
+             prev = curr;
+         }
+        return prev+1;
+        
+    }
+};
+
+```
+---------------------------------------------------------------------------------------------------------------------------------------------------
